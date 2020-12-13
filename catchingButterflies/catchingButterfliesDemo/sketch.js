@@ -10,7 +10,7 @@ let myFont;
 const options = {
   lat: 53.0793, // center in bremen
   lng: 8.8017,
-  zoom: 6,
+  zoom: 10,
   style: 'mapbox://styles/mapbox/dark-v9',
   pitch: 0,
 };
