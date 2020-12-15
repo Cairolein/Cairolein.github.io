@@ -5,39 +5,44 @@ let myMap;
 let canvas;
 let myFont;
 
-
-// Options for map
-const options = {
-  lat: 53.0793, // center in bremen
-  lng: 8.8017,
-  zoom: 6,
-  style: 'mapbox://styles/mapbox/dark-v9',
-  pitch: 0,
-};
-
 let uid = gen_uid(); // unique brower/user id wird als db key benutze...
 let name = "-"; // player name
 let direction = -1; // wohin wird gekucked
 let lat = -1; // wo bin ich
 let long = -1;
-let partnerKey = 'random(0,1000)'
+let partnerKey = '-';
 var database; // db ref
 var players; // liste alle spieler
 
+// Designs der Map
+const options = {
+  
+  lat: 53.0793, // center in bremen
+  lng: 8.8017,
+  zoom: 10,
+  //style: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
+  //style: 'mapbox://styles/mapbox/dark-v9',
+  //mapbox://styles/mapbox/navigation-guidance-day-v4
+  style: 'mapbox://styles/mapbox/light-v9',
+
+  pitch: 0,
+};
+
+
 function preload() {
-  myFont = loadFont('Ligconsolata-Regular.otf');
+  myFont = loadFont('Blueberry-.otf'); // Schriftart wird geladen
 }
 
 
 function setup() {
-  // canvas = createCanvas(windowWidth, windowHeight, WEBGL);
-  canvas = createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight); // Erstellung der Leinwand
   angleMode(DEGREES);
-  textFont(myFont, 20);
-  textSize(20);
+  textFont(myFont, 18); //Schriftart auf Leinwand laden
+  textSize(18); //Schriftgrößen-STandart definiert
   watchPosition(positionChanged); // gps callback
+  
 
-  var firebaseConfig = {
+  var firebaseConfig = { //Multiplayerfunktion
     apiKey: "AIzaSyAHhemIVPZOX5wzRYJG7tRxjile83EiLYk",
     authDomain: "catchingbutterflies-e5e34.firebaseapp.com",
     databaseURL: "https://catchingbutterflies-e5e34-default-rtdb.firebaseio.com",
@@ -53,7 +58,7 @@ function setup() {
   console.log('uid:' + uid);
   database = firebase.database();
 
-  // eingebefeld für den namen
+  // eingebefeld für den Namen
   name = createInput();
   name.position(120, 30);
   name.value(getItem('demoName')); // holt namen aus coookie
@@ -61,6 +66,7 @@ function setup() {
   // eingabefeld für den PartnerKey
   partnerKey = createInput();
   partnerKey.position(120, 60);
+  partnerKey.value(int(random(0,1000))); // Key wird bei jedem neuladen, Öffnen der App / Seite neu initialisiert
   
 
   maintenancePlayerData();
@@ -68,39 +74,53 @@ function setup() {
   getAllPlayerData();
   setInterval(updateData, 2000); // daten mit server abgleichen
 
-  myMap = mappa.tileMap(options);
-  myMap.overlay(canvas);
+  myMap = mappa.tileMap(options); 
+  myMap.overlay(canvas);//MapBox Karte wird auf die Leinwand gelegt.
+
   // myMap.onChange(drawPlayer);
 }
 
+function textDraw(){ //Schriften 
+  fill(255, 105, 180);
+  text("Your name", 20, 45);
+  fill(84, 139, 84,200);
+  text("Key", 70, 72);
+  push();
+  fill(255);
+  noStroke();
+  rect(0, (windowHeight * 0.90), windowWidth, windowHeight);
+  fill(255,215,0)
+  textSize(29);
+  text("Catching Butterflies", 30, (windowHeight * 0.90) + 40);
+  fill(121, 205, 205);
+  text("!",330, (windowHeight * 0.90) + 40);
+  push();
+  fill(137, 104, 205,200);
+  textSize(10);
+  text("made by: Die Regenbogen-Dinos", 50,(windowHeight * 0.90) + 62);
+  pop();
+  pop();
 
-function draw() {
+}
+
+function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
   drawPlayer();
-  fill(255, 181, 2197);
-  text("your name", 20, 45);
-  fill(191, 239, 255);
-  text("Key", 20, 75);
-  /*drawGui();*/
+  textDraw();
 }
 
 
-function drawPlayer() {
+function drawPlayer() { //Spieler implementieren
   clear();
 
   push();
   var mypos = myMap.latLngToPixel(lat, long);
   size = map(myMap.zoom(), 1, 6, 5, 7);
   noStroke();
-  fill(255, 0, 255);
+  fill(255, 105, 180);
   ellipse(mypos.x, mypos.y, size, size);
-  fill(255);
+  fill(255, 105, 180);
   text(name.value(), mypos.x+5, mypos.y);
-  if (rotationZ != null) {
-    stroke(255, 0, 255);
-    fill(255, 0, 255);
-    let dirvec = createVector((cos(rotationZ) * (size * 10)), (sin(rotationZ) * (size * 10)));
-    /*drawArrow(createVector(mypos.x, mypos.y), dirvec, 255);*/
-  }
+  
   if (players != null) {
     var keys = Object.keys(players);
     for (var i = 0; i < keys.length; i++) {
@@ -111,23 +131,17 @@ function drawPlayer() {
         var pos = myMap.latLngToPixel(players[k].lat, players[k].long);
         size = map(myMap.zoom(), 1, 6, 5, 7);
         noStroke();
-        fill(0, 255, 255)
+        fill(121, 205, 205);
         ellipse(pos.x, pos.y, size, size);
-        fill(255);
+        fill(121, 205, 205);
         text(players[k].name, pos.x + 5, pos.y);
-        stroke(0, 255, 255);
-        fill(0, 255, 255);
-        if (players[k].direction != "") {
-          let dirvec = createVector((cos(players[k].direction) * (size * 10)), (sin(players[k].direction) * (size * 10)));
-          /*drawArrow(createVector(pos.x, pos.y), dirvec, 255);*/
-        }
-        stroke(255);
+        
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
           if (ko != k) { // selfcheck
-            var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
-            /*line(pos.x, pos.y, pos_other.x, pos_other.y);*/      
+            var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
             if(partnerKey.value() == players[ko].partnerKey){
+              stroke(137, 104, 205,200);
               line(mypos.x, mypos.y, pos_other.x, pos_other.y);
             }
             
@@ -140,37 +154,11 @@ function drawPlayer() {
   pop();
 }
 
-/*function drawArrow(base, vec, myColor) {
-  push();
-  translate(base.x, base.y);
-  line(0, 0, vec.x, vec.y);
-  rotate(vec.heading());
-  let arrowSize = 8;
-  translate(vec.mag() - arrowSize, 0);
-  triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
-  pop();
-}*/
 
-/*function drawGui() {
-  textSize(15);
-  fill(0);
-  noStroke();
-  rect(0, (windowHeight * 0.90), windowWidth, windowHeight);
-  noStroke();
-  fill(255);
-  var info = "version = " + version + "\ndirection = " + rotationZ + "\n";
-  if (geoCheck() == true) {
-    info += 'lat = ' + lat + '\nlong = ' + long;
-  } else {
-    info += 'no geo';
-  }
-  text(info, 30, (windowHeight * 0.90) + 20);
-  stroke(0, 255, 0);
-}*/
 
 function updateData() {
   updatePlayerData(); // meine daten updaten
-  maintenancePlayerData(); // kill all zombies
+  maintenancePlayerData(); // afk Spieler entfernen
   getAllPlayerData(); // alle anders player daten holen
   storeItem('demoName', name.value()); // meinen player namen im coookie speichern
 }
@@ -202,6 +190,7 @@ function maintenancePlayerData() {
     snapshot.ref.remove();
   });
 }
+
 
 function updatePlayerData() {
   if (rotationZ != null) {
