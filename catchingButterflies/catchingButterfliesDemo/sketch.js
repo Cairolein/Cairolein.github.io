@@ -13,6 +13,7 @@ let long = -1;
 let partnerKey = '-';
 var database; // db ref
 var players; // liste alle spieler
+let netBoolean = false;
 
 // Designs der Map
 const options = {
@@ -30,15 +31,16 @@ const options = {
 
 
 function preload() {
-  myFont = loadFont('Blueberry-.otf'); // Schriftart wird geladen
+  //myFont = loadFont('Blueberry-.otf'); // Schriftart wird geladen
+  myFont = loadFont('AlohaSummer.otf'); // Schriftart wird geladen
 }
 
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight); // Erstellung der Leinwand
   angleMode(DEGREES);
-  textFont(myFont, 18); //Schriftart auf Leinwand laden
-  textSize(18); //Schriftgrößen-STandart definiert
+  textFont(myFont, 35); //Schriftart auf Leinwand laden
+  textSize(35); //Schriftgrößen-STandart definiert
   watchPosition(positionChanged); // gps callback
   
 
@@ -82,18 +84,18 @@ function setup() {
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your name", 20, 45);
+  text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key", 70, 72);
+  text("Key", 70, 80);
   push();
   fill(255);
   noStroke();
   rect(0, (windowHeight * 0.90), windowWidth, windowHeight);
   fill(255,215,0)
-  textSize(29);
+  textSize(48);
   text("Catching Butterflies", 30, (windowHeight * 0.90) + 40);
   fill(121, 205, 205);
-  text("!",330, (windowHeight * 0.90) + 40);
+  text("!",280, (windowHeight * 0.90) + 40);
   push();
   fill(137, 104, 205,200);
   textSize(10);
@@ -140,6 +142,7 @@ function drawPlayer() { //Spieler implementieren
           var ko = keys[j];
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
+
             if(partnerKey.value() == players[ko].partnerKey){
               stroke(137, 104, 205,200);
               line(mypos.x, mypos.y, pos_other.x, pos_other.y);
