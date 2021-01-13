@@ -176,6 +176,29 @@ function drawPlayer() { //Spieler implementieren
   pop();
 }
 
+//function mouseReleased(){
+  //if (players != null) {
+    //var keys = Object.keys(players);
+      //for (var i = 0; i < keys.length; i++) {
+        //var k = keys[i];
+        //if (k != uid) {
+          //for (var j = 0; j < keys.length; j++) {
+            //var ko = keys[j];
+            //if (ko != k) { // selfcheck
+              //var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
+              //if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
+                //idPartner = players[ko].uid;
+
+//              }
+  //          }
+    //      }
+      //  }
+      //}
+    //}
+  //}
+//}
+
+
 
 
 function updateData() {
@@ -250,3 +273,4 @@ function gen_uid() {
   uid += screen_info.pixelDepth || '';
   return uid;
 }
+
