@@ -19,6 +19,7 @@ let button;
 
 
 
+
 // Designs der Map
 const options = {
   
@@ -48,9 +49,16 @@ function setup() {
   watchPosition(positionChanged); // gps callback
 
 
-  button = createButton('Reset Connection');
+  button = createButton('Refresh PlayerList');
   button.position(300,30);
   button.mousePressed(reset);
+
+  push();  
+  sel = createSelect();
+  sel.position(300,60);
+  sel.option('none');
+  sel.selected('none');
+  pop();
 
   
 
@@ -92,7 +100,7 @@ function setup() {
   // myMap.onChange(drawPlayer);
 }
 function reset(){
-  partnerKey.value(int(random(0,1000)));
+  window.location.reload();
 }
 
 function textDraw(){ //Schriften 
@@ -123,11 +131,26 @@ function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
   textDraw();
 }
 
+function askConnection(){
+  if (players != null) {
+    var keys = Object.keys(players);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if( sel.selected(players[k].name) == players[k].name){
+        players[k].alert(name.value() +" wanna connect to you");
+        idPartner = players[k].uid;
+      }
+    }
+  }
+  
+
+}
 
 function drawPlayer() { //Spieler implementieren
   clear();
-
+  askConnection();
   push();
+  
   var mypos = myMap.latLngToPixel(lat, long);
   size = map(myMap.zoom(), 1, 6, 5, 7);
   noStroke();
@@ -156,6 +179,9 @@ function drawPlayer() { //Spieler implementieren
           var ko = keys[j];
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
+
+          
+
             //if(partnerKey.value() == players[ko].partnerKey){
               //stroke(137, 104, 205,200);
               //line(mypos.x, mypos.y, pos_other.x, pos_other.y);
@@ -166,15 +192,15 @@ function drawPlayer() { //Spieler implementieren
       }
     }
   }
-
   pop();
 }
 
+
 //function mouseReleased(){
   //if (players != null) {
-    //var keys = Object.keys(players);
-      //for (var i = 0; i < keys.length; i++) {
-        //var k = keys[i];
+  //var keys = Object.keys(players);
+    //  for (var i = 0; i < keys.length; i++) {
+      //  var k = keys[i];
         //if (k != uid) {
           //for (var j = 0; j < keys.length; j++) {
             //var ko = keys[j];
@@ -183,11 +209,11 @@ function drawPlayer() { //Spieler implementieren
               //if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
                 //idPartner = players[ko].uid;
 
-//              }
-  //          }
-    //      }
-      //  }
-      //}
+             //}
+            //}
+          //}
+       //}
+     //}
     //}
   //}
 
@@ -231,7 +257,19 @@ function maintenancePlayerData() {
 }
 
 
+
 function updatePlayerData() {
+    if (players != null) {
+    var keys = Object.keys(players);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (k != uid) {
+        sel.option(players[k].name);      
+      }
+    }
+  }
+
+
   if (rotationZ != null) {
     direction = rotationZ;
   } else {
@@ -267,5 +305,6 @@ function gen_uid() {
   uid += screen_info.pixelDepth || '';
   return uid;
 }
+
 
 
