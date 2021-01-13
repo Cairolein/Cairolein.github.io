@@ -136,7 +136,6 @@ function drawPlayer() { //Spieler implementieren
   fill(255, 105, 180);
   text(name.value(), mypos.x+5, mypos.y);
   
-  
   if (players != null) {
     var keys = Object.keys(players);
     for (var i = 0; i < keys.length; i++) {
@@ -146,32 +145,27 @@ function drawPlayer() { //Spieler implementieren
         // not myself
         var pos = myMap.latLngToPixel(players[k].lat, players[k].long);
         size = map(myMap.zoom(), 1, 6, 5, 7);
-        }
+      
         noStroke();
         fill(121, 205, 205);
         ellipse(pos.x, pos.y, size, size);
         fill(121, 205, 205);
         text(players[k].name, pos.x + 5, pos.y);
         
-        
-        
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
-            
-
-           //if(partnerKey.value() == players[ko].partnerKey ){   
-             //    stroke(137, 104, 205,200);
-               //   line(mypos.x, mypos.y, pos_other.x, pos_other.y);
-              //}
-            }
+            //if(partnerKey.value() == players[ko].partnerKey){
+              //stroke(137, 104, 205,200);
+              //line(mypos.x, mypos.y, pos_other.x, pos_other.y);
+            //}
             
           }
         }
       }
-    
-
+    }
+  }
 
   pop();
 }
@@ -251,7 +245,7 @@ function updatePlayerData() {
     partnerKey: partnerKey.value(),
     timestamp: Date.now(),
     netBoolean: netBoolean,
-    idPartner: idPartner,
+    idPartner: idPartner,   
   });
 }
 
@@ -273,4 +267,5 @@ function gen_uid() {
   uid += screen_info.pixelDepth || '';
   return uid;
 }
+
 
