@@ -200,6 +200,7 @@ function drawPlayer() { //Spieler implementieren
 
 
 function mouseReleased(){
+  if(idPartner== 'none'){
   if (players != null) {
   var keys = Object.keys(players);
       for (var i = 0; i < keys.length; i++) {
@@ -210,9 +211,9 @@ function mouseReleased(){
             if (ko != k) { // selfcheck
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
               if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
-                idPartner = players[ko].uid;
-                alert(idPartner);
-                //alert("You tried to connect to " + players[ko].name);
+                idPartner = players[ko].uid;        
+                alert("You tried to connect to " + players[ko].name);
+               }
                 
              }
             }
@@ -312,4 +313,3 @@ function gen_uid() {
   uid += screen_info.pixelDepth || '';
   return uid;
 }
-
