@@ -103,9 +103,9 @@ function setup() {
   // myMap.onChange(drawPlayer);
 }
 function reset(){
+  window.location.reload();
   idPartner= 'none';
-  //window.location.reload();
-  
+ 
 }
 
 //function mySelectChange(){
@@ -181,7 +181,10 @@ function drawPlayer() { //Spieler implementieren
                 if(players[ko].idPartner == uid && idPartner == 'none'){
                  if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
                    idPartner = players[ko].uid;
-                  }                   
+                  } else{
+                    alert("Connection lost");
+                    players[ko].idPartner = 'none';
+                  }                 
                  }
               //stroke(137, 104, 205,200);
               //line(mypos.x, mypos.y, pos_other.x, pos_other.y);
