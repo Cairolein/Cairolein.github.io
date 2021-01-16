@@ -177,9 +177,11 @@ function drawPlayer() { //Spieler implementieren
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
 
-           
-
-            //if(partnerKey.value() == players[ko].partnerKey){
+                if(players[ko].idPartner == uid && idPartner == null){
+                 if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
+                   idPartner = players[ko].uid;
+                  }                   
+                 }
               //stroke(137, 104, 205,200);
               //line(mypos.x, mypos.y, pos_other.x, pos_other.y);
             //}
@@ -206,11 +208,6 @@ function mouseReleased(){
               if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
                 idPartner = players[ko].uid;
                 alert("You tried to connect to " + players[ko].name);
-
-                if(players[ko].window.confirm(name + " tried to connect to you")){
-                  players[ko].idPartner = uid;
-                  alert(players[ko].name + " acceptec your connection");
-                };
                 
              }
             }
