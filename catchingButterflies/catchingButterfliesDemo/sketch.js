@@ -180,11 +180,11 @@ function drawPlayer() { //Spieler implementieren
                  if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
                    idPartner = players[ko].uid;
                   } else{
+                    alert("connection declined");  
                     window.location.reload();
                     //firebase.database().ref('player/' + players[ko].uid).update({
                       //idPartner: 'none'
-                    //});
-                    alert("connection declined");                    
+                    //});               
                   }                 
                  }
               //stroke(137, 104, 205,200);
