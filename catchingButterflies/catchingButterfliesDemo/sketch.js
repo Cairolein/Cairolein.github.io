@@ -50,7 +50,7 @@ function setup() {
   watchPosition(positionChanged); // gps callback
 
 
-  button = createButton('Refresh PlayerList');
+  button = createButton('Delete Connection');
   button.position(300,30);
   button.mousePressed(reset);
 
