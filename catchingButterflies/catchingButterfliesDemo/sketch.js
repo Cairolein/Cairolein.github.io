@@ -104,8 +104,6 @@ function setup() {
 }
 function reset(){
   window.location.reload();
-  idPartner= 'none';
- 
 }
 
 //function mySelectChange(){
@@ -182,8 +180,10 @@ function drawPlayer() { //Spieler implementieren
                  if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
                    idPartner = players[ko].uid;
                   } else{
-                    alert("Connection lost");
-                    players[ko].idPartner = 'none';
+                    firebase.database().ref('player/' + players[ko].uid).set({
+                     idPartner: 'none',
+                    });
+                    alert("connection declined");                    
                   }                 
                  }
               //stroke(137, 104, 205,200);
@@ -312,3 +312,4 @@ function gen_uid() {
   uid += screen_info.pixelDepth || '';
   return uid;
 }
+
