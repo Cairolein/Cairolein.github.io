@@ -181,7 +181,7 @@ function drawPlayer() { //Spieler implementieren
                    idPartner = players[ko].uid;
                   } else{
                     firebase.database().ref('player/' + players[ko].uid).update({
-                      idPartner: 'none',
+                      idPartner = 'none',
                     });
                     alert("connection declined");                    
                   }                 
