@@ -5,7 +5,7 @@ let myMap;
 let canvas;
 let myFont;
 
-let uid = gen_uid(); // unique brower/user id wird als db key benutze...
+var uid = gen_uid(); // unique brower/user id wird als db key benutze...
 let name = "-"; // player name
 let direction = -1; // wohin wird gekucked
 let lat = -1; // wo bin ich
@@ -14,7 +14,7 @@ let partnerKey = '-';
 var database; // db ref
 var players; // liste alle spieler
 var request = null;
-var idPartner = null;
+var idPartner = 'none';
 let button;
 //let sel = null;
 
@@ -103,7 +103,8 @@ function setup() {
   // myMap.onChange(drawPlayer);
 }
 function reset(){
-  window.location.reload();
+  idPartner= 'none';
+  //window.location.reload();
   
 }
 
@@ -177,7 +178,7 @@ function drawPlayer() { //Spieler implementieren
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
 
-                if(players[ko].idPartner == uid && idPartner == null){
+                if(players[ko].idPartner == uid && idPartner == 'none'){
                  if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
                    idPartner = players[ko].uid;
                   }                   
@@ -207,7 +208,8 @@ function mouseReleased(){
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
               if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
                 idPartner = players[ko].uid;
-                alert("You tried to connect to " + players[ko].name);
+                alert(idPartner);
+                //alert("You tried to connect to " + players[ko].name);
                 
              }
             }
@@ -285,6 +287,7 @@ function updatePlayerData() {
     timestamp: Date.now(),
     request: request,
     idPartner: idPartner,  
+    uid: uid,
   });
 }
 
@@ -306,6 +309,3 @@ function gen_uid() {
   uid += screen_info.pixelDepth || '';
   return uid;
 }
-
-
-
