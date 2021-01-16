@@ -180,8 +180,8 @@ function drawPlayer() { //Spieler implementieren
                  if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
                    idPartner = players[ko].uid;
                   } else{
-                    firebase.database().ref('player/' + players[ko].uid).set({
-                     idPartner: 'none',
+                    firebase.database().ref('player/' + players[ko].uid).update({
+                      idPartner: 'none',
                     });
                     alert("connection declined");                    
                   }                 
