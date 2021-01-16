@@ -13,9 +13,10 @@ let long = -1;
 let partnerKey = '-';
 var database; // db ref
 var players; // liste alle spieler
-var netBoolean = false;
+var request = null;
 var idPartner = null;
 let button;
+//let sel = null;
 
 
 
@@ -53,12 +54,14 @@ function setup() {
   button.position(300,30);
   button.mousePressed(reset);
 
-  push();  
-  sel = createSelect();
-  sel.position(300,60);
-  sel.option('none');
-  sel.selected('none');
-  pop();
+  //push();  
+  //sel = createSelect();
+  //sel.position(300,60);
+  //sel.option('none');
+  //sel.option('apple')
+  //sel.selected('none');
+  //sel.changed(mySelectChange);
+  //pop();
 
   
 
@@ -101,7 +104,12 @@ function setup() {
 }
 function reset(){
   window.location.reload();
+  
 }
+
+//function mySelectChange(){
+  //alert("You tried to Connect to " + sel.value());
+//}
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
@@ -131,26 +139,14 @@ function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
   textDraw();
 }
 
-function askConnection(){
-  if (players != null) {
-    var keys = Object.keys(players);
-    for (var i = 0; i < keys.length; i++) {
-      var k = keys[i];
-      if( sel.selected(players[k].name) == players[k].name){
-        players[k].alert(name.value() +" wanna connect to you");
-        idPartner = players[k].uid;
-      }
-    }
-  }
-  
 
-}
+
 
 function drawPlayer() { //Spieler implementieren
   clear();
-  askConnection();
+ 
   push();
-  
+
   var mypos = myMap.latLngToPixel(lat, long);
   size = map(myMap.zoom(), 1, 6, 5, 7);
   noStroke();
@@ -165,7 +161,7 @@ function drawPlayer() { //Spieler implementieren
       var k = keys[i];
       // console.log("Key: " + k + "   lat: " + players[k].lat + "   Name: " + players[k].long);
       if (k != uid) {
-        // not myself
+        // not myself      
         var pos = myMap.latLngToPixel(players[k].lat, players[k].long);
         size = map(myMap.zoom(), 1, 6, 5, 7);
       
@@ -174,13 +170,14 @@ function drawPlayer() { //Spieler implementieren
         ellipse(pos.x, pos.y, size, size);
         fill(121, 205, 205);
         text(players[k].name, pos.x + 5, pos.y);
+       
         
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
 
-          
+           
 
             //if(partnerKey.value() == players[ko].partnerKey){
               //stroke(137, 104, 205,200);
@@ -196,26 +193,32 @@ function drawPlayer() { //Spieler implementieren
 }
 
 
-//function mouseReleased(){
-  //if (players != null) {
-  //var keys = Object.keys(players);
-    //  for (var i = 0; i < keys.length; i++) {
-      //  var k = keys[i];
-        //if (k != uid) {
-          //for (var j = 0; j < keys.length; j++) {
-            //var ko = keys[j];
-            //if (ko != k) { // selfcheck
-              //var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
-              //if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
-                //idPartner = players[ko].uid;
+function mouseReleased(){
+  if (players != null) {
+  var keys = Object.keys(players);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        if (k != uid) {
+          for (var j = 0; j < keys.length; j++) {
+            var ko = keys[j];
+            if (ko != k) { // selfcheck
+              var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
+              if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
+                idPartner = players[ko].uid;
+                alert("You tried to connect to " + players[ko].name);
 
-             //}
-            //}
-          //}
-       //}
-     //}
-    //}
-  //}
+                if(players[ko].window.confirm(name + " tried to connect to you")){
+                  players[ko].idPartner = uid;
+                  alert(players[ko].name + " acceptec your connection");
+                };
+                
+             }
+            }
+          }
+       }
+     }
+    }
+  }
 
 
 
@@ -259,15 +262,16 @@ function maintenancePlayerData() {
 
 
 function updatePlayerData() {
-    if (players != null) {
-    var keys = Object.keys(players);
-    for (var i = 0; i < keys.length; i++) {
-      var k = keys[i];
-      if (k != uid) {
-        sel.option(players[k].name);      
-      }
-    }
-  }
+   
+    //if (players != null) {
+    //var keys = Object.keys(players);
+    //for (var i = 0; i < keys.length; i++) {
+     // var k = keys[i];
+      //if (k != uid) {
+        //sel.option(players[k].name);      
+      //}
+    //}
+  //}
 
 
   if (rotationZ != null) {
@@ -282,8 +286,8 @@ function updatePlayerData() {
     name: name.value(),
     partnerKey: partnerKey.value(),
     timestamp: Date.now(),
-    netBoolean: netBoolean,
-    idPartner: idPartner,   
+    request: request,
+    idPartner: idPartner,  
   });
 }
 
