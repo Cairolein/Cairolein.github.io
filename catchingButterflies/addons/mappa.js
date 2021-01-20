@@ -1314,8 +1314,8 @@ var MapboxGL = function (_TileMap) {
 
     var _this = _possibleConstructorReturn(this, (MapboxGL.__proto__ || Object.getPrototypeOf(MapboxGL)).call(this, options));
 
-    _this.scriptSrc = 'https://api.mapbox.com/mapbox-gl-js/v0.43.0/mapbox-gl.js';
-    _this.styleSrc = 'https://api.mapbox.com/mapbox-gl-js/v0.43.0/mapbox-gl.css';
+    _this.scriptSrc = 'https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js';
+    _this.styleSrc = 'https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css';
     _this.ready = false;
     if (!_this.options.key) {
       MapboxGL.messages().key();
