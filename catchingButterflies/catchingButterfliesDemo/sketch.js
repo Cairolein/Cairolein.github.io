@@ -115,7 +115,7 @@ function textDraw(){ //Schriften
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key2", 70, 80);
+  text("Key1", 70, 80);
   push();
   fill(255);
   noStroke();
@@ -178,7 +178,7 @@ function drawPlayer() { //Spieler implementieren
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
             
                 if(idPartner == players[ko].uid && !players[ko].netBoolean && idPartner == 'none'){
-                  stroke(193, 205, 205,150);             
+                  stroke(193, 205, 205,200);             
                   line(mypos.x, mypos.y, pos_other.x, pos_other.y);
                 }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
                        idPartner = players[ko].uid;
