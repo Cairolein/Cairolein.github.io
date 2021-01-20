@@ -177,7 +177,7 @@ function drawPlayer() { //Spieler implementieren
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
             
-                if(idPartner == players[ko].uid && !players[ko].netBoolean && idPartner == 'none'){
+                if(players[ko].idPartner == uid && !netBoolean && idPartner == 'none'){
                   stroke(193, 205, 205,200);             
                   line(mypos.x, mypos.y, pos_other.x, pos_other.y);
                 }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
