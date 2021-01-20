@@ -15,6 +15,7 @@ var database; // db ref
 var players; // liste alle spieler
 var request = null;
 var idPartner = 'none';
+var netBoolean = false;
 let button;
 //let sel = null;
 
@@ -175,20 +176,16 @@ function drawPlayer() { //Spieler implementieren
           var ko = keys[j];
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
-
-                if(players[ko].idPartner == uid && idPartner == 'none'){
-                 if(window.confirm(players[ko].name + " tried to connect to you, do you agree?")){
-                   idPartner = players[ko].uid;
-                  } else{
-                    firebase.database().ref('player/' + players[ko].uid).update({
-                      idPartner: 'none'
-                    });        
-                    alert("connection declined");
-                  }                 
-                 }
-              //stroke(137, 104, 205,200);
-              //line(mypos.x, mypos.y, pos_other.x, pos_other.y);
-            //}
+            
+                if(idPartner == players[ko].uid && !netBoolean && idPartner == 'none'){
+                  stroke(193, 205, 205,150);
+                  line(mypos.x, mypos.y, pos_other.x, pos_other.y);
+                     if(players[ko].idPartner == uid && idPartner == players[ko].uid){
+                       idPartner = players[ko].uid;
+                        stroke(137, 104, 205,200);
+                        line(mypos.x, mypos.y, pos_other.x, pos_other.y);                          
+                     }                 
+                   }
             
           }
         }
@@ -213,6 +210,7 @@ function mouseReleased(){
               if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
                 idPartner = players[ko].uid;        
                 alert("You tried to connect to " + players[ko].name);
+                netBoolean = true;       
                }
                 
              }
@@ -292,6 +290,7 @@ function updatePlayerData() {
     request: request,
     idPartner: idPartner,  
     uid: uid,
+    netBoolean: netBoolean,
   });
 }
 
