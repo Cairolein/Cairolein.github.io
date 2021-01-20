@@ -177,15 +177,15 @@ function drawPlayer() { //Spieler implementieren
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
             
-                if(idPartner == players[ko].uid && !netBoolean && idPartner == 'none'){
-                  stroke(193, 205, 205,150);
+                if(idPartner == players[ko].uid && !players[ko].netBoolean && idPartner == 'none'){
+                  stroke(193, 205, 205,150);             
                   line(mypos.x, mypos.y, pos_other.x, pos_other.y);
-                     if(players[ko].idPartner == uid && idPartner == players[ko].uid){
+                }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
                        idPartner = players[ko].uid;
                         stroke(137, 104, 205,200);
-                        line(mypos.x, mypos.y, pos_other.x, pos_other.y);                          
+                        line(mypos.x, mypos.y, pos_other.x, pos_other.y);                      
                      }                 
-                   }
+                   
             
           }
         }
