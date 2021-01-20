@@ -115,7 +115,7 @@ function textDraw(){ //Schriften
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key3", 70, 80);
+  text("Key1", 70, 80);
   push();
   fill(255);
   noStroke();
@@ -165,12 +165,20 @@ function drawPlayer() { //Spieler implementieren
         var pos = myMap.latLngToPixel(players[k].lat, players[k].long);
         size = map(myMap.zoom(), 1, 6, 5, 7);
       
-        noStroke();
-        fill(121, 205, 205);
-        ellipse(pos.x, pos.y, size, size);
-        fill(121, 205, 205);
-        text(players[k].name, pos.x + 5, pos.y);
-       
+            if(players[k].netBoolean){
+                noStroke();
+              fill(106, 90, 205);
+              ellipse(pos.x, pos.y, size, size);
+              fill(106, 90, 205);
+              text(players[k].name, pos.x + 5, pos.y);
+            
+            }else{
+              noStroke();
+              fill(121, 205, 205);
+              ellipse(pos.x, pos.y, size, size);
+              fill(121, 205, 205);
+              text(players[k].name, pos.x + 5, pos.y);
+            }
         
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
@@ -183,10 +191,9 @@ function drawPlayer() { //Spieler implementieren
                 }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
                        idPartner = players[ko].uid;
                         stroke(137, 104, 205,200);
-                        line(mypos.x, mypos.y, pos_other.x, pos_other.y);                      
+                        line(mypos.x, mypos.y, pos_other.x, pos_other.y);                          
                      }                 
-                   
-            
+ 
           }
         }
       }
@@ -208,9 +215,13 @@ function mouseReleased(){
             if (ko != k) { // selfcheck
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
               if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
-                idPartner = players[ko].uid;        
-                alert("You tried to connect to " + players[ko].name);
-                netBoolean = true;       
+                if(players[ko].netBoolean){
+                  alert("Player already has a connection");
+                }else{
+                  idPartner = players[ko].uid;        
+                  alert("You tried to connect to " + players[ko].name);
+                  netBoolean = true;       
+                }
                }
                 
              }
