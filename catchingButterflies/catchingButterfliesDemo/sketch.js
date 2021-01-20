@@ -31,8 +31,9 @@ const options = {
   //style: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
   //style: 'mapbox://styles/mapbox/dark-v9',
   //mapbox://styles/mapbox/navigation-guidance-day-v4
-  style: 'mapbox://styles/mapbox/light-v9',
-
+  //style: 'mapbox://styles/mapbox/light-v9',
+    style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us',
+  //style: 'mapbox://styles/terry1301/ckinhhy62286g17lnynnpj8u2',
   pitch: 0,
 };
 
@@ -115,7 +116,7 @@ function textDraw(){ //Schriften
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key4", 70, 80);
+  text("Key1", 70, 80);
   push();
   fill(255);
   noStroke();
@@ -214,14 +215,11 @@ function mouseReleased(){
             var ko = keys[j];
             if (ko != k) { // selfcheck
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
-              if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){
-                if(players[ko].netBoolean){
-                  alert("Player already has a connection");
-                }else{
+              if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){           
                   idPartner = players[ko].uid;        
                   alert("You tried to connect to " + players[ko].name);
                   netBoolean = true;       
-                }
+                
                }
                 
              }
