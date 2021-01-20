@@ -115,7 +115,7 @@ function textDraw(){ //Schriften
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key1", 70, 80);
+  text("Key3", 70, 80);
   push();
   fill(255);
   noStroke();
