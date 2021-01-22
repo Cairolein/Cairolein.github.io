@@ -116,7 +116,7 @@ function textDraw(){ //Schriften
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key3", 70, 80);
+  text("Key2", 70, 80);
   push();
   fill(255);
   noStroke();
@@ -186,7 +186,8 @@ function drawPlayer() { //Spieler implementieren
           if (ko != k) { // selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
             
-                if(players[ko].idPartner == uid && !netBoolean && idPartner == 'none'){
+                if((players[ko].idPartner == uid && !netBoolean && idPartner == 'none' )
+                      ||( players[ko].idPartner == 'none' && !players[ko].netBoolean && idPartner == players[ko].uid)){
                   stroke(193, 205, 205,200);             
                   line(mypos.x, mypos.y, pos_other.x, pos_other.y);
                 }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
@@ -205,7 +206,7 @@ function drawPlayer() { //Spieler implementieren
 
 
 function mouseReleased(){
-  if(idPartner== 'none'){
+  if(idPartner == 'none'){
   if (players != null) {
   var keys = Object.keys(players);
       for (var i = 0; i < keys.length; i++) {
