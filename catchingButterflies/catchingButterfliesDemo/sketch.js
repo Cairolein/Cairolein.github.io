@@ -80,11 +80,14 @@ function setup() {
   name = createInput();
   name.position(120, 30);
   name.value(getItem('demoName')); // holt namen aus coookie
+
   for(let i = 0; i < 10; i++){
-    butterflies.push(new Butterflies());
+    butterflies.push(new Butterflies);
+   // butterflies.push(new Butterflies(myMap.latLngToPixel(position.latitude, position.longitude).x,
+    //myMap.latLngToPixel(position.latitude, position.longitude).y ));
   }
 
-  updateButterfliesToServer();
+  //updateButterfliesToServer();
   maintenancePlayerData();
   updatePlayerData();
   getAllPlayerData();
@@ -333,12 +336,12 @@ function gen_uid() {
 class Butterflies{
   
  
-  constructor(){
+  constructor(/*posx, posy*/){
     this.id = "S"+ int(random(100000000));
     this.dead = false;
     this.birthtime = millis();
-    this.x = random(width);
-    this.y = random(height);
+    this.x = /*posx;*/random(width);
+    this.y = /*posy;*/random(height);
     this.maxAge = random(5000, 15000);
     this.diameter = 100;
   }
