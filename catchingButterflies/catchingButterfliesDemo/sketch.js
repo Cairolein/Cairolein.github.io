@@ -10,7 +10,7 @@ let name = "-"; // player name
 let direction = -1; // wohin wird gekucked
 let lat = -1; // wo bin ich
 let long = -1;
-let partnerKey = '-';
+//let partnerKey = '-';
 var database; // db ref
 var players; // liste alle spieler
 var request = null;
@@ -34,6 +34,7 @@ const options = {
   //style: 'mapbox://styles/mapbox/light-v9',
     style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us',
   //style: 'mapbox://styles/terry1301/ckinhhy62286g17lnynnpj8u2',
+  //style: 'mapbox://styles/cairolein/ckk81ztkz0y6p17ju9gbab1zv',
   pitch: 0,
 };
 
@@ -89,9 +90,9 @@ function setup() {
   name.value(getItem('demoName')); // holt namen aus coookie
    
   // eingabefeld für den PartnerKey
-  partnerKey = createInput();
-  partnerKey.position(120, 60);
-  partnerKey.value(int(random(0,1000))); // Key wird bei jedem neuladen, Öffnen der App / Seite neu initialisiert
+ // partnerKey = createInput();
+ // partnerKey.position(120, 60);
+ // partnerKey.value(int(random(0,1000))); // Key wird bei jedem neuladen, Öffnen der App / Seite neu initialisiert
   
 
   maintenancePlayerData();
@@ -116,7 +117,7 @@ function textDraw(){ //Schriften
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key2", 70, 80);
+  //text("Key2", 70, 80);
   push();
   fill(255);
   noStroke();
@@ -295,7 +296,7 @@ function updatePlayerData() {
     long: long,
     direction: direction,
     name: name.value(),
-    partnerKey: partnerKey.value(),
+    //partnerKey: partnerKey.value(),
     timestamp: Date.now(),
     request: request,
     idPartner: idPartner,  
