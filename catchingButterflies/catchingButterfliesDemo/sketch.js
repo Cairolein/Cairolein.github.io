@@ -4,20 +4,20 @@ const version = "21";
 let myMap;
 let canvas;
 let myFont;
+let butterflies = [];
+//let speed = 0.3;
 
 var uid = gen_uid(); // unique brower/user id wird als db key benutze...
 let name = "-"; // player name
 let direction = -1; // wohin wird gekucked
 let lat = -1; // wo bin ich
 let long = -1;
-let partnerKey = '-';
 var database; // db ref
 var players; // liste alle spieler
 var request = null;
 var idPartner = 'none';
 var netBoolean = false;
 let button;
-//let sel = null;
 
 
 
@@ -51,22 +51,14 @@ function setup() {
   textFont(myFont, 35); //Schriftart auf Leinwand laden
   textSize(35); //Schriftgrößen-STandart definiert
   watchPosition(positionChanged); // gps callback
+  img = loadImage('butter.png');
+  
 
 
   button = createButton('Delete Connection');
   button.position(300,30);
   button.mousePressed(reset);
 
-  //push();  
-  //sel = createSelect();
-  //sel.position(300,60);
-  //sel.option('none');
-  //sel.option('apple')
-  //sel.selected('none');
-  //sel.changed(mySelectChange);
-  //pop();
-
-  
 
   var firebaseConfig = { //Multiplayerfunktion
     apiKey: "AIzaSyAHhemIVPZOX5wzRYJG7tRxjile83EiLYk",
@@ -88,36 +80,41 @@ function setup() {
   name = createInput();
   name.position(120, 30);
   name.value(getItem('demoName')); // holt namen aus coookie
-   
-  // eingabefeld für den PartnerKey
-  partnerKey = createInput();
-  partnerKey.position(120, 60);
-  partnerKey.value(int(random(0,1000))); // Key wird bei jedem neuladen, Öffnen der App / Seite neu initialisiert
-  
 
+  for(let i = 0; i < 10; i++){
+    butterflies.push(new Butterflies);
+   // butterflies.push(new Butterflies(myMap.latLngToPixel(position.latitude, position.longitude).x,
+    //myMap.latLngToPixel(position.latitude, position.longitude).y ));
+  }
+
+  //updateButterfliesToServer();
   maintenancePlayerData();
   updatePlayerData();
   getAllPlayerData();
   setInterval(updateData, 2000); // daten mit server abgleichen
-
   myMap = mappa.tileMap(options); 
   myMap.overlay(canvas);//MapBox Karte wird auf die Leinwand gelegt.
-
-  // myMap.onChange(drawPlayer);
+  myMap.onChange(drawPlayer);
+  myMap.onChange(drawButterflies);
+  setInterval(updateButterfliesToServer, 5000);
+  
 }
 function reset(){
   window.location.reload();
 }
 
-//function mySelectChange(){
-  //alert("You tried to Connect to " + sel.value());
-//}
+
+function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
+  drawPlayer();
+  textDraw();
+  drawButterflies();
+}
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
   text("Your name", 20, 50);
   fill(84, 139, 84,200);
-  text("Key2", 70, 80);
+  //text("Key2", 70, 80);
   push();
   fill(255);
   noStroke();
@@ -136,17 +133,26 @@ function textDraw(){ //Schriften
 
 }
 
-function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
-  drawPlayer();
-  textDraw();
+function drawButterflies(){
+  for(let i = 0; i < butterflies.length; i++){
+   butterflies[i].move();
+    butterflies[i].display();
+    if ( butterflies[i].dead){
+      butterflies.splice(i, 1)
+    }
+  }
+  if(butterflies.length < 10){
+    butterflies.push(new Butterflies());
+  }
 }
 
 
 
-
 function drawPlayer() { //Spieler implementieren
+  
   clear();
- 
+  
+
   push();
 
   var mypos = myMap.latLngToPixel(lat, long);
@@ -203,8 +209,8 @@ function drawPlayer() { //Spieler implementieren
     }
   }
   pop();
+  
 }
-
 
 function mouseReleased(){
   if(idPartner == 'none'){
@@ -232,10 +238,6 @@ function mouseReleased(){
     }
   }
 
-
-
-
-
 function updateData() {
   updatePlayerData(); // meine daten updaten
   maintenancePlayerData(); // afk Spieler entfernen
@@ -248,12 +250,20 @@ function getAllPlayerData() {
   ref.on("value", gotData, errData);
 }
 
+function getAllButterfliesData(){
+  var ref = database.ref('butterflies');
+  ref.on("value", gotDataButterflies, errData);
+}
+
 function errData(data) {
   // nop
 }
 
 function gotData(data) {
   players = data.val();
+}
+function gotDataButterflies(data){
+  butterflies = data.val();
 }
 
 function positionChanged(position) {
@@ -271,20 +281,20 @@ function maintenancePlayerData() {
   });
 }
 
+function updateButterfliesToServer(){
+  for(let i = 0; i < butterflies.length; i++){
+    var position = myMap.pixelToLatlng(butterflies[i].x, butterflies[i].y)
+      firebase.database().ref('butterflies/' + butterflies[i].id).set({
+        lat: position.latitude,
+        long: position.longitude,
+        timestamp: Date.now()
+      });
+    }
+  }
 
 
 function updatePlayerData() {
-   
-    //if (players != null) {
-    //var keys = Object.keys(players);
-    //for (var i = 0; i < keys.length; i++) {
-     // var k = keys[i];
-      //if (k != uid) {
-        //sel.option(players[k].name);      
-      //}
-    //}
-  //}
-
+  
 
   if (rotationZ != null) {
     direction = rotationZ;
@@ -296,7 +306,6 @@ function updatePlayerData() {
     long: long,
     direction: direction,
     name: name.value(),
-    partnerKey: partnerKey.value(),
     timestamp: Date.now(),
     request: request,
     idPartner: idPartner,  
@@ -322,4 +331,39 @@ function gen_uid() {
   uid += screen_info.width || '';
   uid += screen_info.pixelDepth || '';
   return uid;
+}
+
+class Butterflies{
+  
+ 
+  constructor(/*posx, posy*/){
+    this.id = "S"+ int(random(100000000));
+    this.dead = false;
+    this.birthtime = millis();
+    this.x = /*posx;*/random(width);
+    this.y = /*posy;*/random(height);
+    this.maxAge = random(5000, 15000);
+    this.diameter = 100;
+  }
+
+  age(){
+    return abs(millis() - this.birthtime);
+  }
+
+  move(){
+    this.x += random(-1,1); //(this.x * (1-speed)) + (this.targetx * speed);
+    this.y += random(-1,1); //(this.y * (1-speed)) + (this.targety * speed);
+
+    this.diameter = map(this.age(),0, this.maxAge,60,5);
+    if(this.age() > this.maxAge ){
+      this.dead = true;
+    }
+  }
+
+  display(){
+    
+   if(!this.dead){
+      image(img, this.x, this.y, this.diameter, this.diameter);
+    }
+ }
 }
