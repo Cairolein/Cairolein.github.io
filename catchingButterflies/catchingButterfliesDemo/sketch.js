@@ -18,6 +18,9 @@ var request = null;
 var idPartner = 'none';
 var netBoolean = false;
 let button;
+var spawnCoords = [{lat: 53.07462, lng: 8.80843}, {lat: 52.98225, lng: 8.84977}];
+var score = 0;
+
 
 
 
@@ -56,7 +59,7 @@ function setup() {
 
 
   button = createButton('Delete Connection');
-  button.position(300,30);
+  button.position((windowWidth-(windowWidth-300)),(windowHeight-(windowHeight-30)));
   button.mousePressed(reset);
 
 
@@ -78,16 +81,19 @@ function setup() {
 
   // eingebefeld für den Namen
   name = createInput();
-  name.position(120, 30);
+  name.position((windowWidth-(windowWidth-120)), (windowHeight-(windowHeight-30)));
   name.value(getItem('demoName')); // holt namen aus coookie
+  var radius = 0.8;
+  Math.seedrandom("CatchingButterflies"+ day() + month() + year());
 
-  for(let i = 0; i < 10; i++){
-    butterflies.push(new Butterflies);
-   // butterflies.push(new Butterflies(myMap.latLngToPixel(position.latitude, position.longitude).x,
-    //myMap.latLngToPixel(position.latitude, position.longitude).y ));
+  for(let i = 0; i < spawnCoords.length; i++){
+    for(let butterflyCount = 0; butterflyCount<30; butterflyCount++){
+      var c = {lat:spawnCoords[i].lat+(Math.random()-0.5)*radius*0.5, lng: spawnCoords[i].lng+(Math.random()-0.5)*radius};
+      butterflies.push(new Butterflies(c));
+    }
   }
 
-  //updateButterfliesToServer();
+  
   maintenancePlayerData();
   updatePlayerData();
   getAllPlayerData();
@@ -106,29 +112,31 @@ function reset(){
 
 function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
   drawPlayer();
-  textDraw();
   drawButterflies();
+  textDraw();
 }
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your name", 20, 50);
+  text("Your name", (windowWidth-(windowWidth-20)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   //text("Key2", 70, 80);
   push();
   fill(255);
-  noStroke();
+  stroke(152,245,255);
+  strokeWeight(4);
   rect(0, (windowHeight * 0.90), windowWidth, windowHeight);
+  noStroke();
   fill(255,215,0)
   textSize(48);
   text("Catching Butterflies", 30, (windowHeight * 0.90) + 40);
+  fill(255, 105, 180);
+  text("Your Score: " + score, windowWidth - 200,(windowHeight * 0.90) + 40)
   fill(121, 205, 205);
   text("!",280, (windowHeight * 0.90) + 40);
-  push();
   fill(137, 104, 205,200);
   textSize(10);
   text("made by: Die Regenbogen-Dinos", 50,(windowHeight * 0.90) + 62);
-  pop();
   pop();
 
 }
@@ -140,9 +148,6 @@ function drawButterflies(){
     if ( butterflies[i].dead){
       butterflies.splice(i, 1)
     }
-  }
-  if(butterflies.length < 10){
-    butterflies.push(new Butterflies());
   }
 }
 
@@ -200,7 +205,11 @@ function drawPlayer() { //Spieler implementieren
                 }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
                        idPartner = players[ko].uid;
                         stroke(137, 104, 205,200);
-                        line(mypos.x, mypos.y, pos_other.x, pos_other.y);                          
+                        line(mypos.x, mypos.y, pos_other.x, pos_other.y); 
+                        for(var b = 0; b < butterflies.length; b++){
+                          butterflies[b].checkCollision(mypos,pos_other);
+
+                        }                         
                      }                 
  
           }
@@ -283,7 +292,7 @@ function maintenancePlayerData() {
 
 function updateButterfliesToServer(){
   for(let i = 0; i < butterflies.length; i++){
-    var position = myMap.pixelToLatlng(butterflies[i].x, butterflies[i].y)
+    var position = myMap.pixelToLatLng(butterflies[i].x, butterflies[i].y)
       firebase.database().ref('butterflies/' + butterflies[i].id).set({
         lat: position.latitude,
         long: position.longitude,
@@ -336,12 +345,14 @@ function gen_uid() {
 class Butterflies{
   
  
-  constructor(/*posx, posy*/){
+  constructor(coords){
     this.id = "S"+ int(random(100000000));
     this.dead = false;
     this.birthtime = millis();
-    this.x = /*posx;*/random(width);
-    this.y = /*posy;*/random(height);
+    this.lng = coords.lng;
+    this.lat = coords.lat;
+    this.x = 0;
+    this.y = 0;
     this.maxAge = random(5000, 15000);
     this.diameter = 100;
   }
@@ -351,19 +362,130 @@ class Butterflies{
   }
 
   move(){
-    this.x += random(-1,1); //(this.x * (1-speed)) + (this.targetx * speed);
-    this.y += random(-1,1); //(this.y * (1-speed)) + (this.targety * speed);
+    var coord = myMap.latLngToPixel(this.lat, this.lng);
+    this.x = coord.x + random(-1,1); //(this.x * (1-speed)) + (this.targetx * speed);
+    this.y = coord.y + random(-1,1); //(this.y * (1-speed)) + (this.targety * speed);
 
-    this.diameter = map(this.age(),0, this.maxAge,60,5);
+    /*this.diameter = map(this.age(),0, this.maxAge,60,5);
     if(this.age() > this.maxAge ){
       this.dead = true;
     }
+    */
   }
 
-  display(){
-    
+  display(){       
    if(!this.dead){
-      image(img, this.x, this.y, this.diameter, this.diameter);
+      image(img, this.x-this.diameter/2, this.y-this.diameter/2, this.diameter, this.diameter);
     }
  }
+
+ checkCollision(mypos,pos_other){
+  var pointonline = getClosestPointOnLines({x:this.x,y:this.y},[mypos,pos_other]);
+  var geoPoint = myMap.pixelToLatLng(pointonline.x, pointonline.y);
+  var dist = GeoDistanceInMeter(geoPoint.lat,geoPoint.lng,this.lat, this.lng);
+  console.log(dist);
+  if(dist<20){
+    this.dead = true;
+    score += 1;
+  }
+ }
+}
+
+/* desc Static function. Find point on lines nearest test point
+   test point pXy with properties .x and .y
+   lines defined by array aXys with nodes having properties .x and .y 
+   return is object with .x and .y properties and property i indicating nearest segment in aXys 
+   and property fFrom the fractional distance of the returned point from aXy[i-1]
+   and property fTo the fractional distance of the returned point from aXy[i]   */
+
+
+   function getClosestPointOnLines(pXy, aXys) {
+
+    var minDist;
+    var fTo;
+    var fFrom;
+    var x;
+    var y;
+    var i;
+    var dist;
+
+    if (aXys.length > 1) {
+
+        for (var n = 1 ; n < aXys.length ; n++) {
+
+            if (aXys[n].x != aXys[n - 1].x) {
+                var a = (aXys[n].y - aXys[n - 1].y) / (aXys[n].x - aXys[n - 1].x);
+                var b = aXys[n].y - a * aXys[n].x;
+                dist = Math.abs(a * pXy.x + b - pXy.y) / Math.sqrt(a * a + 1);
+            }
+            else
+                dist = Math.abs(pXy.x - aXys[n].x)
+
+            // length^2 of line segment 
+            var rl2 = Math.pow(aXys[n].y - aXys[n - 1].y, 2) + Math.pow(aXys[n].x - aXys[n - 1].x, 2);
+
+            // distance^2 of pt to end line segment
+            var ln2 = Math.pow(aXys[n].y - pXy.y, 2) + Math.pow(aXys[n].x - pXy.x, 2);
+
+            // distance^2 of pt to begin line segment
+            var lnm12 = Math.pow(aXys[n - 1].y - pXy.y, 2) + Math.pow(aXys[n - 1].x - pXy.x, 2);
+
+            // minimum distance^2 of pt to infinite line
+            var dist2 = Math.pow(dist, 2);
+
+            // calculated length^2 of line segment
+            var calcrl2 = ln2 - dist2 + lnm12 - dist2;
+
+            // redefine minimum distance to line segment (not infinite line) if necessary
+            if (calcrl2 > rl2)
+                dist = Math.sqrt(Math.min(ln2, lnm12));
+
+            if ((minDist == null) || (minDist > dist)) {
+                if (calcrl2 > rl2) {
+                    if (lnm12 < ln2) {
+                        fTo = 0;//nearer to previous point
+                        fFrom = 1;
+                    }
+                    else {
+                        fFrom = 0;//nearer to current point
+                        fTo = 1;
+                    }
+                }
+                else {
+                    // perpendicular from point intersects line segment
+                    fTo = ((Math.sqrt(lnm12 - dist2)) / Math.sqrt(rl2));
+                    fFrom = ((Math.sqrt(ln2 - dist2)) / Math.sqrt(rl2));
+                }
+                minDist = dist;
+                i = n;
+            }
+        }
+
+        var dx = aXys[i - 1].x - aXys[i].x;
+        var dy = aXys[i - 1].y - aXys[i].y;
+
+        x = aXys[i - 1].x - (dx * fTo);
+        y = aXys[i - 1].y - (dy * fTo);
+
+    }
+
+    return { 'x': x, 'y': y, 'i': i, 'fTo': fTo, 'fFrom': fFrom };
+}
+
+const EARTH_RADIUS = 6378137;
+
+function GeoDistanceInMeter(lat1, lon1, lat2, lon2) {
+    //const R = 6371e3; // metres
+    const phi1 = lat1 * Math.PI / 180; // phi, lamda in radians
+    const phi2 = lat2 * Math.PI / 180;
+    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+        Math.cos(phi1) * Math.cos(phi2) *
+        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    //return R * c; // in metres
+    return EARTH_RADIUS * c; // in meters
 }
