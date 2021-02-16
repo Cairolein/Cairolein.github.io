@@ -5,11 +5,10 @@ let myMap;
 let canvas;
 let myFont;
 let butterflies = [];
-//let speed = 0.3;
 
 var uid = gen_uid(); // unique brower/user id wird als db key benutze...
 let name = "-"; // player name
-let direction = -1; // wohin wird gekucked
+let direction = -1; // wohin wird geschaut
 let lat = -1; // wo bin ich
 let long = -1;
 var database; // db ref
@@ -31,19 +30,12 @@ const options = {
   lat: 53.0793, // center in bremen
   lng: 8.8017,
   zoom: 10,
-  //style: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
-  //style: 'mapbox://styles/mapbox/dark-v9',
-  //mapbox://styles/mapbox/navigation-guidance-day-v4
-  //style: 'mapbox://styles/mapbox/light-v9',
-    style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us',
-  //style: 'mapbox://styles/terry1301/ckinhhy62286g17lnynnpj8u2',
-  //style: 'mapbox://styles/cairolein/ckk81ztkz0y6p17ju9gbab1zv',
+  style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us',
   pitch: 0,
 };
 
 
 function preload() {
-  //myFont = loadFont('Blueberry-.otf'); // Schriftart wird geladen
   myFont = loadFont('AlohaSummer.otf'); // Schriftart wird geladen
 }
 
@@ -103,7 +95,6 @@ function setup() {
   myMap.onChange(drawPlayer);
   myMap.onChange(drawButterflies);
   myMap.onChange(textDraw);
-  setInterval(updateButterfliesToServer, 5000);
   
 }
 function reset(){
@@ -260,20 +251,12 @@ function getAllPlayerData() {
   ref.on("value", gotData, errData);
 }
 
-function getAllButterfliesData(){
-  var ref = database.ref('butterflies');
-  ref.on("value", gotDataButterflies, errData);
-}
-
 function errData(data) {
   // nop
 }
 
 function gotData(data) {
   players = data.val();
-}
-function gotDataButterflies(data){
-  butterflies = data.val();
 }
 
 function positionChanged(position) {
@@ -290,19 +273,6 @@ function maintenancePlayerData() {
     snapshot.ref.remove();
   });
 }
-
-function updateButterfliesToServer(){
-  for(let i = 0; i < butterflies.length; i++){
-    var position = myMap.pixelToLatLng(butterflies[i].x, butterflies[i].y)
-      firebase.database().ref('butterflies/' + butterflies[i].id).set({
-        lat: position.latitude,
-        long: position.longitude,
-        timestamp: Date.now()
-      });
-    }
-  }
-
-
 function updatePlayerData() {
   
 
@@ -354,24 +324,13 @@ class Butterflies{
     this.lat = coords.lat;
     this.x = 0;
     this.y = 0;
-    this.maxAge = random(5000, 15000);
     this.diameter = 100;
-  }
-
-  age(){
-    return abs(millis() - this.birthtime);
   }
 
   move(){
     var coord = myMap.latLngToPixel(this.lat, this.lng);
     this.x = coord.x + random(-1,1); //(this.x * (1-speed)) + (this.targetx * speed);
     this.y = coord.y + random(-1,1); //(this.y * (1-speed)) + (this.targety * speed);
-
-    /*this.diameter = map(this.age(),0, this.maxAge,60,5);
-    if(this.age() > this.maxAge ){
-      this.dead = true;
-    }
-    */
   }
 
   display(){       
