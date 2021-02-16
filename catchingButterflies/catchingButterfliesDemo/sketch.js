@@ -102,6 +102,7 @@ function setup() {
   myMap.overlay(canvas);//MapBox Karte wird auf die Leinwand gelegt.
   myMap.onChange(drawPlayer);
   myMap.onChange(drawButterflies);
+  myMap.onChange(textDraw);
   setInterval(updateButterfliesToServer, 5000);
   
 }
