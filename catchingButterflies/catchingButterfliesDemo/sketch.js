@@ -42,25 +42,24 @@ const options = {
   pitch: 0,
 };
 
-
+// Schriftart wird geladen
 function preload() {
-  //myFont = loadFont('Blueberry-.otf'); // Schriftart wird geladen
-  myFont = loadFont('AlohaSummer.otf'); // Schriftart wird geladen
+  myFont = loadFont('AlohaSummer.otf'); 
 }
 
-
+//Vorbereitung der Leindwand
 function setup() {
-  canvas = createCanvas(windowWidth, windowHeight); // Erstellung der Leinwand
+  canvas = createCanvas(windowWidth, windowHeight); 
   angleMode(DEGREES);
   textFont(myFont, 35); //Schriftart auf Leinwand laden
-  textSize(35); //Schriftgrößen-STandart definiert
+  textSize(35); //Schriftgröße
   watchPosition(positionChanged); // gps callback
   img = loadImage('butter.png');
   
 
 
   button = createButton('Delete Connection');
-  button.position((windowWidth-(windowWidth-300)),(windowHeight-(windowHeight-30)));
+  button.position((windowWidth-(windowWidth-15)),(windowHeight-(windowHeight-90)));
   button.mousePressed(reset);
 
 
@@ -82,7 +81,7 @@ function setup() {
 
   // eingebefeld für den Namen
   name = createInput();
-  name.position((windowWidth-(windowWidth-120)), (windowHeight-(windowHeight-30)));
+  name.position((windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-60)));
   name.value(getItem('demoName')); // holt namen aus coookie
   var radius = 0.8;
   Math.seedrandom("CatchingButterflies"+ day() + month() + year());
@@ -108,7 +107,8 @@ function setup() {
   
 }
 function reset(){
-  window.location.reload();
+  idPartner = 'none';
+  netBoolean = false;
 }
 
 
@@ -120,27 +120,10 @@ function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your name", (windowWidth-(windowWidth-20)), (windowHeight-(windowHeight-50)));
+  text("Your name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
-  //text("Key2", 70, 80);
-  push();
-  fill(255);
-  stroke(152,245,255);
-  strokeWeight(4);
-  rect(0, (windowHeight * 0.90), windowWidth, windowHeight);
-  noStroke();
-  fill(255,215,0)
-  textSize(48);
-  text("Catching Butterflies", 30, (windowHeight * 0.90) + 40);
-  fill(255, 105, 180);
-  text("Your Score: " + score, windowWidth - 200,(windowHeight * 0.90) + 40)
-  fill(121, 205, 205);
-  text("!",280, (windowHeight * 0.90) + 40);
-  fill(137, 104, 205,200);
-  textSize(10);
-  text("made by: Die Regenbogen-Dinos", 50,(windowHeight * 0.90) + 62);
-  pop();
-
+  fill(137, 104, 205);
+  text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
 }
 
 function drawButterflies(){
