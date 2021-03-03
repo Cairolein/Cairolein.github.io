@@ -1,18 +1,17 @@
  
-const mappakey = 'pk.eyJ1IjoiY2Fpcm9sZWluIiwiYSI6ImNraW5jZXl2NDBuZ3YycHAzemtudjZlZTYifQ.m10BNeMIqNZAJ7wZhYdm6A';
-const mappa = new Mappa('MapboxGL', mappakey);
+var mappakey = 'pk.eyJ1IjoiY2Fpcm9sZWluIiwiYSI6ImNraW5jZXl2NDBuZ3YycHAzemtudjZlZTYifQ.m10BNeMIqNZAJ7wZhYdm6A';
+var mappa = new Mappa('MapboxGL', mappakey);
 const version = "21";
 let myMap;
 let canvas;
 let myFont;
 let butterflies = [];
-//let speed = 0.3;
 
 var uid = gen_uid(); // unique brower/user id wird als db key benutze...
 let name = "-"; // player name
-let direction = -1; // wohin wird gekucked
 let lat = -1; // wo bin ich
 let long = -1;
+
 var database; // db ref
 var players; // liste alle spieler
 var request = null;
@@ -32,15 +31,11 @@ const options = {
   lat: 53.0793, // center in bremen
   lng: 8.8017,
   zoom: 10,
-  //style: 'mapbox://styles/mapbox/navigation-guidance-day-v4',
-  //style: 'mapbox://styles/mapbox/dark-v9',
-  //mapbox://styles/mapbox/navigation-guidance-day-v4
-  //style: 'mapbox://styles/mapbox/light-v9',
     style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us',
-  //style: 'mapbox://styles/terry1301/ckinhhy62286g17lnynnpj8u2',
-  //style: 'mapbox://styles/cairolein/ckk81ztkz0y6p17ju9gbab1zv',
   pitch: 0,
+  
 };
+
 
 // Schriftart wird geladen
 function preload() {
@@ -49,13 +44,12 @@ function preload() {
 
 //Vorbereitung der Leindwand
 function setup() {
+  noCanvas();
   canvas = createCanvas(windowWidth, windowHeight); 
-  angleMode(DEGREES);
   textFont(myFont, 35); //Schriftart auf Leinwand laden
   textSize(35); //Schriftgröße
-  watchPosition(positionChanged); // gps callback
   img = loadImage('butter.png');
-  
+  watchPosition(positionChanged); // gps callback
 
 
   button = createButton('Delete Connection');
@@ -79,38 +73,48 @@ function setup() {
   console.log('uid:' + uid);
   database = firebase.database();
 
+ //if( getItem('latitude') != undefined || getItem('longitude') != undefined){
+  // lat = parseFloat(getItem('latitude'));
+   //long = paseFloat(getItem('longitude'));
+   //options.lat = lat;
+  // options.lng = long;
+ //}
+
+
+  
+
   // eingebefeld für den Namen
   name = createInput();
   name.position((windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-60)));
   name.value(getItem('demoName')); // holt namen aus coookie
-  var radius = 0.8;
+  var radius = 0.5;
   Math.seedrandom("CatchingButterflies"+ day() + month() + year());
 
   for(let i = 0; i < spawnCoords.length; i++){
-    for(let butterflyCount = 0; butterflyCount<30; butterflyCount++){
-      var c = {lat:spawnCoords[i].lat+(Math.random()-0.5)*radius*0.5, lng: spawnCoords[i].lng+(Math.random()-0.5)*radius};
+    for(let butterflyCount = 0; butterflyCount<300; butterflyCount++){
+      var c = {lat:spawnCoords[i].lat+(Math.random())*radius*0.3, lng: spawnCoords[i].lng+(Math.random()-0.6)*radius};
       butterflies.push(new Butterflies(c));
     }
   }
+  
+    myMap = mappa.tileMap(options); 
+    myMap.overlay(canvas);//MapBox Karte wird auf die Leinwand gelegt.
+    myMap.onChange(drawPlayer);
+    myMap.onChange(drawButterflies);
+    myMap.onChange(textDraw);
 
   
   maintenancePlayerData();
   updatePlayerData();
   getAllPlayerData();
   setInterval(updateData, 2000); // daten mit server abgleichen
-  myMap = mappa.tileMap(options); 
-  myMap.overlay(canvas);//MapBox Karte wird auf die Leinwand gelegt.
-  myMap.onChange(drawPlayer);
-  myMap.onChange(drawButterflies);
-  myMap.onChange(textDraw);
-  setInterval(updateButterfliesToServer, 5000);
-  
+ 
 }
+
 function reset(){
   idPartner = 'none';
   netBoolean = false;
 }
-
 
 function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
   drawPlayer();
@@ -195,7 +199,11 @@ function drawPlayer() { //Spieler implementieren
                           butterflies[b].checkCollision(mypos,pos_other);
 
                         }                         
-                     }                 
+                     }
+                     else if (idPartner == players[ko].uid && players[ko].idPartner != 'none' && players[ko].idPartner != uid){
+                      reset();
+                      alert("Your connection to " + players[ko].name + "has been deleted. " + players[ko].name + " found somebody else to play with...");
+                     }                   
  
           }
         }
@@ -329,7 +337,7 @@ function gen_uid() {
 
 class Butterflies{
   
- 
+ //Schmetterlinge-Klasse
   constructor(coords){
     this.id = "S"+ int(random(100000000));
     this.dead = false;
@@ -339,23 +347,13 @@ class Butterflies{
     this.x = 0;
     this.y = 0;
     this.maxAge = random(5000, 15000);
-    this.diameter = 100;
-  }
-
-  age(){
-    return abs(millis() - this.birthtime);
+    this.diameter = 35;
   }
 
   move(){
     var coord = myMap.latLngToPixel(this.lat, this.lng);
     this.x = coord.x + random(-1,1); //(this.x * (1-speed)) + (this.targetx * speed);
     this.y = coord.y + random(-1,1); //(this.y * (1-speed)) + (this.targety * speed);
-
-    /*this.diameter = map(this.age(),0, this.maxAge,60,5);
-    if(this.age() > this.maxAge ){
-      this.dead = true;
-    }
-    */
   }
 
   display(){       
@@ -364,12 +362,13 @@ class Butterflies{
     }
  }
 
+
  checkCollision(mypos,pos_other){
   var pointonline = getClosestPointOnLines({x:this.x,y:this.y},[mypos,pos_other]);
   var geoPoint = myMap.pixelToLatLng(pointonline.x, pointonline.y);
   var dist = GeoDistanceInMeter(geoPoint.lat,geoPoint.lng,this.lat, this.lng);
   console.log(dist);
-  if(dist<20){
+  if(dist<50){
     this.dead = true;
     score += 1;
   }
