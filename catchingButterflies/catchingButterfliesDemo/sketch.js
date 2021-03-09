@@ -124,7 +124,7 @@ function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("your Name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
