@@ -368,7 +368,7 @@ class Butterflies{
   var geoPoint = myMap.pixelToLatLng(pointonline.x, pointonline.y);
   var dist = GeoDistanceInMeter(geoPoint.lat,geoPoint.lng,this.lat, this.lng);
   console.log(dist);
-  if(dist<50){
+  if(dist<15 && this.dead == false){
     this.dead = true;
     score += 1;
   }
