@@ -124,7 +124,7 @@ function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your Name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
@@ -368,7 +368,7 @@ class Butterflies{
   var geoPoint = myMap.pixelToLatLng(pointonline.x, pointonline.y);
   var dist = GeoDistanceInMeter(geoPoint.lat,geoPoint.lng,this.lat, this.lng);
   console.log(dist);
-  if(dist<8 && this.dead == false){
+  if(dist<5 && this.dead == false){
     this.dead = true;
     score += 1;
   }
