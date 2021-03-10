@@ -18,7 +18,7 @@ let long = -1;            // Standort des Spielers - Longitude
 
 var database;             // db ref
 var players;              // Liste aller Spieler
-//var request = null; 
+var request = null; 
 var idPartner = 'none';   // Variable in der uid des Spielers gespeichert wird, mit dem man sich verbinden will
 var netBoolean = false;   // Gibt an, ob eine Verbindung zu einem anderen Spieler besteht (true = ja , false= nein)
 let button;               // Button, um Verbindung zu anderem Spieler zu löschen
@@ -129,13 +129,13 @@ function draw() { // Spieler, Schmetterlinge und Schriften werden auf die Leinwa
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your Name1", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your Name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
   fill(137, 104, 205);
- var keys = Object.keys(players);
-  text("Keys =  " + keys.length, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-200)));
+  var keys = Object.keys(players)
+  text("PartnerID " + keys.length, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-200)));
 }
 
 function drawButterflies(){ //Schmetterlings-Objekte aus Array auf Leinwand darstellen
@@ -317,19 +317,18 @@ function updateButterfliesToServer(){
 
 
 function updatePlayerData() { // Spielerdaten an Firebase Datenbank übertragen
-  /*
   if (rotationZ != null) {
     direction = rotationZ;
   } else {
     direction = ""; // no gps
-  }*/
+  }
   firebase.database().ref('player/' + uid).set({
     lat: lat,
     long: long,
-    //direction: direction,
+    direction: direction,
     name: name.value(),
     timestamp: Date.now(),
-    //request: request,
+    request: request,
     idPartner: idPartner,  
     uid: uid,
     netBoolean: netBoolean,
