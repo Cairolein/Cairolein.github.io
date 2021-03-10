@@ -231,31 +231,28 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
   //Durch Liste mit Spielern iterieren
   if(idPartner == 'none'){ // nur wenn noch keine Verbindungsanfrage zu einem Spieler besteht
   if (players != null) {
-  var keys = Object.keys(players);
-      for (var i = 0; i < keys.length; i++) {
-        var k = keys[i];
-        if (k != uid) {
-          for (var j = 0; j < keys.length; j++) {
-            var ko = keys[j];
-            if (ko != k) { // Selfcheck
-              var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
+  //var keys = Object.keys(players);
+      for (var i = 0; i < players.length; i++) {
+        //var k = keys[i];
+        if (players[i].uid != uid) {
+          //for (var j = 0; j < keys.length; j++) {
+            //var ko = keys[j];
+            //if (ko != k) { // Selfcheck
+              var pos_other = myMap.latLngToPixel(players[i].lat, players[i].long); // Positionen der anderen Spieler
 
 
               if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20 && idPartner == 'none'){ 
                 //Wenn Klick in unmittelbarer Nähe zu anderem Spieler erfolgt -> Verbindungsanfrage über "idPartner" Variable mit Meldung       
-                  idPartner = players[ko].uid; //zuweisen der uid des angefragten Spielers        
-                  alert("You tried to connect to " + players[ko].name); // Meldung, dass Verbindungsanfrage erfolgt ist
+                  idPartner = players[i].uid; //zuweisen der uid des angefragten Spielers        
+                  alert("You tried to connect to " + players[i].name); // Meldung, dass Verbindungsanfrage erfolgt ist
                   netBoolean = true; //(potentielle) Verbindung besteht      
                 
-               }
-                
-             }
-            }
-          }
-       }
-     }
+         }      
+        }
+      }
     }
   }
+}
 
 function updateData() {
   updatePlayerData();       // Meine Daten updaten
