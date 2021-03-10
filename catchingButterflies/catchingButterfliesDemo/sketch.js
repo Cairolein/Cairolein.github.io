@@ -129,7 +129,7 @@ function draw() { // Spieler, Schmetterlinge und Schriften werden auf die Leinwa
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your Name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your Name1", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
@@ -267,10 +267,10 @@ function getAllPlayerData() { //Spielerdaten von Datenbank abrufen
   ref.on("value", gotData, errData);
 }
 
-/*function getAllButterfliesData(){
+function getAllButterfliesData(){
   var ref = database.ref('butterflies');
   ref.on("value", gotDataButterflies, errData);
-}*/
+}
 
 function errData(data) {
   // nop
@@ -280,10 +280,10 @@ function gotData(data) {
   players = data.val();
 }
 
-/*
+
 function gotDataButterflies(data){
   butterflies = data.val();
-}*/
+}
 
 function positionChanged(position) { //Anpassung Standortdaten
   lat = position.latitude;
@@ -300,7 +300,7 @@ function maintenancePlayerData() { //"Zombies" entfernen
   });
 }
 
-/*
+
 function updateButterfliesToServer(){
   for(let i = 0; i < butterflies.length; i++){
     var position = myMap.pixelToLatLng(butterflies[i].x, butterflies[i].y)
@@ -310,7 +310,7 @@ function updateButterfliesToServer(){
         timestamp: Date.now()
       });
     }
-  }*/
+  }
 
 
 function updatePlayerData() { // Spielerdaten an Firebase Datenbank übertragen
