@@ -129,7 +129,7 @@ function draw() { // Spieler, Schmetterlinge und Schriften werden auf die Leinwa
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your Name ", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your Name self ", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
@@ -192,7 +192,7 @@ function drawPlayer() { //Spieler darstellen
         
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
-          if (ko != k) { // Selfcheck
+          //if (ko != k) { // Selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
             
                 //Potentielle Verbindung (grau), wenn mich jemand anfragt und ich diesen noch nicht ausgewählt habe ODER wenn ich jemanden anfrage und dieser noch keinen Partner ausgewählt hat
@@ -216,7 +216,7 @@ function drawPlayer() { //Spieler darstellen
                       alert("Your connection to " + players[ko].name + "has been deleted. " + players[ko].name + " found somebody else to play with...");
                      }                   
  
-          }
+         //}
         }
       }
     }
@@ -235,7 +235,7 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
         if (k != uid) {
           for (var j = 0; j < keys.length; j++) {
             var ko = keys[j];
-            if (ko != k) { // Selfcheck
+            //if (ko != k) { // Selfcheck
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
 
 
@@ -247,7 +247,7 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
                 
               }
                 
-            }
+            //}
           }
         }
       }
