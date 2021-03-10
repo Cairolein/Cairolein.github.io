@@ -18,7 +18,6 @@ let long = -1;            // Standort des Spielers - Longitude
 
 var database;             // db ref
 var players;              // Liste aller Spieler
-var request = null; 
 var idPartner = 'none';   // Variable in der uid des Spielers gespeichert wird, mit dem man sich verbinden will
 var netBoolean = false;   // Gibt an, ob eine Verbindung zu einem anderen Spieler besteht (true = ja , false= nein)
 let button;               // Button, um Verbindung zu anderem Spieler zu löschen
@@ -129,7 +128,7 @@ function draw() { // Spieler, Schmetterlinge und Schriften werden auf die Leinwa
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your Name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your Name 1", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
@@ -192,7 +191,6 @@ function drawPlayer() { //Spieler darstellen
         
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
-          //if (ko != k) { // Selfcheck
             var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
             
                 //Potentielle Verbindung (grau), wenn mich jemand anfragt und ich diesen noch nicht ausgewählt habe ODER wenn ich jemanden anfrage und dieser noch keinen Partner ausgewählt hat
@@ -214,9 +212,7 @@ function drawPlayer() { //Spieler darstellen
                      else if (idPartner == players[ko].uid && players[ko].idPartner != 'none' && players[ko].idPartner != uid){
                       reset();
                       alert("Your connection to " + players[ko].name + "has been deleted. " + players[ko].name + " found somebody else to play with...");
-                     }                   
- 
-         //}
+          }                   
         }
       }
     }
@@ -235,7 +231,6 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
         if (k != uid) {
           for (var j = 0; j < keys.length; j++) {
             var ko = keys[j];
-            //if (ko != k) { // Selfcheck
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
 
 
@@ -246,8 +241,6 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
                   netBoolean = true; //(potentielle) Verbindung besteht      
                 
               }
-                
-            //}
           }
         }
       }
@@ -267,22 +260,12 @@ function getAllPlayerData() { //Spielerdaten von Datenbank abrufen
   ref.on("value", gotData, errData);
 }
 
-function getAllButterfliesData(){
-  var ref = database.ref('butterflies');
-  ref.on("value", gotDataButterflies, errData);
-}
-
 function errData(data) {
   // nop
 }
 
 function gotData(data) {
   players = data.val();
-}
-
-
-function gotDataButterflies(data){
-  butterflies = data.val();
 }
 
 function positionChanged(position) { //Anpassung Standortdaten
@@ -300,25 +283,7 @@ function maintenancePlayerData() { //"Zombies" entfernen
   });
 }
 
-
-function updateButterfliesToServer(){
-  for(let i = 0; i < butterflies.length; i++){
-    var position = myMap.pixelToLatLng(butterflies[i].x, butterflies[i].y)
-      firebase.database().ref('butterflies/' + butterflies[i].id).set({
-        lat: position.latitude,
-        long: position.longitude,
-        timestamp: Date.now()
-      });
-    }
-  }
-
-
 function updatePlayerData() { // Spielerdaten an Firebase Datenbank übertragen
-  if (rotationZ != null) {
-    direction = rotationZ;
-  } else {
-    direction = ""; // no gps
-  }
   firebase.database().ref('player/' + uid).set({
     lat: lat,
     long: long,
