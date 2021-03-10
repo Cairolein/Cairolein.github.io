@@ -14,15 +14,11 @@ let long = -1;
 
 var database; // db ref
 var players; // liste alle spieler
-var request = null;
 var idPartner = 'none';
 var netBoolean = false;
 let button;
 var spawnCoords = [{lat: 53.07462, lng: 8.80843}, {lat: 52.98225, lng: 8.84977}];
 var score = 0;
-
-
-
 
 
 // Designs der Map
@@ -72,13 +68,6 @@ function setup() {
   console.log(firebase);
   console.log('uid:' + uid);
   database = firebase.database();
-
- //if( getItem('latitude') != undefined || getItem('longitude') != undefined){
-  // lat = parseFloat(getItem('latitude'));
-   //long = paseFloat(getItem('longitude'));
-   //options.lat = lat;
-  // options.lng = long;
- //}
 
 
   
@@ -252,20 +241,12 @@ function getAllPlayerData() {
   ref.on("value", gotData, errData);
 }
 
-function getAllButterfliesData(){
-  var ref = database.ref('butterflies');
-  ref.on("value", gotDataButterflies, errData);
-}
-
 function errData(data) {
   // nop
 }
 
 function gotData(data) {
   players = data.val();
-}
-function gotDataButterflies(data){
-  butterflies = data.val();
 }
 
 function positionChanged(position) {
@@ -283,33 +264,13 @@ function maintenancePlayerData() {
   });
 }
 
-function updateButterfliesToServer(){
-  for(let i = 0; i < butterflies.length; i++){
-    var position = myMap.pixelToLatLng(butterflies[i].x, butterflies[i].y)
-      firebase.database().ref('butterflies/' + butterflies[i].id).set({
-        lat: position.latitude,
-        long: position.longitude,
-        timestamp: Date.now()
-      });
-    }
-  }
-
 
 function updatePlayerData() {
-  
-
-  if (rotationZ != null) {
-    direction = rotationZ;
-  } else {
-    direction = ""; // no gps
-  }
   firebase.database().ref('player/' + uid).set({
     lat: lat,
     long: long,
-    direction: direction,
     name: name.value(),
     timestamp: Date.now(),
-    request: request,
     idPartner: idPartner,  
     uid: uid,
     netBoolean: netBoolean,
