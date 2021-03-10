@@ -129,7 +129,7 @@ function draw() { // Spieler, Schmetterlinge und Schriften werden auf die Leinwa
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("Your Name new", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your Name nbla", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
@@ -232,10 +232,10 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
   var keys = Object.keys(players);
       for (var i = 0; i < keys.length; i++) {
         var k = keys[i];
-        if (k != uid) {
+        //if (k != uid) {
           for (var j = 0; j < keys.length; j++) {
             var ko = keys[j];
-            if (ko != k) { // Selfcheck
+            //if (ko != k) { // Selfcheck
               var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
 
 
@@ -247,9 +247,9 @@ function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge f
                 
               }
                 
-            }
+            //}
           }
-        }
+        //}
       }
     }
   }
