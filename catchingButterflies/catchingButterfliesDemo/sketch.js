@@ -1,33 +1,42 @@
- 
+ //Variablen für Map
 var mappakey = 'pk.eyJ1IjoiY2Fpcm9sZWluIiwiYSI6ImNraW5jZXl2NDBuZ3YycHAzemtudjZlZTYifQ.m10BNeMIqNZAJ7wZhYdm6A';
 var mappa = new Mappa('MapboxGL', mappakey);
 const version = "21";
 let myMap;
 let canvas;
+
+//Variable für Schrift
 let myFont;
+
+//Schmetterling Array
 let butterflies = [];
 
-var uid = gen_uid(); // unique brower/user id wird als db key benutze...
-let name = "-"; // player name
-let lat = -1; // wo bin ich
-let long = -1;
+var uid = gen_uid();        // uid als db key
+let name = "-";            // Name des Spielers
+let lat = -1;             // Standort des Spielers - Latitude
+let long = -1;            // Standort des Spielers - Longitude
 
-var database; // db ref
-var players; // liste alle spieler
-var idPartner = 'none';
-var netBoolean = false;
-let button;
-var spawnCoords = [{lat: 53.07462, lng: 8.80843}, {lat: 52.98225, lng: 8.84977}];
+var database;             // db ref
+var players;              // Liste aller Spieler
+//var request = null; 
+var idPartner = 'none';   // Variable in der uid des Spielers gespeichert wird, mit dem man sich verbinden will
+var netBoolean = false;   // Gibt an, ob eine Verbindung zu einem anderen Spieler besteht (true = ja , false= nein)
+let button;               // Button, um Verbindung zu anderem Spieler zu löschen
+var spawnCoords = [{lat: 53.07462, lng: 8.80843}, {lat: 52.98225, lng: 8.84977}]; // Im Umkreis dieser Koordinaten, werden random Schmetterlinge gespawnt
 var score = 0;
+
+
+
 
 
 // Designs der Map
 const options = {
   
-  lat: 53.0793, // center in bremen
+  // Zentraler Standort in Bremen für initiale Kartenansicht
+  lat: 53.0793, 
   lng: 8.8017,
-  zoom: 10,
-    style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us',
+  zoom: 10, //initialer Zoomfaktor
+    style: 'mapbox://styles/cairolein/ckioqp3h451ap18l3ws9ec3us', //Style der Karte
   pitch: 0,
   
 };
@@ -38,19 +47,19 @@ function preload() {
   myFont = loadFont('AlohaSummer.otf'); 
 }
 
-//Vorbereitung der Leindwand
+//Initialisieren der Leinwand
 function setup() {
   noCanvas();
   canvas = createCanvas(windowWidth, windowHeight); 
-  textFont(myFont, 35); //Schriftart auf Leinwand laden
-  textSize(35); //Schriftgröße
-  img = loadImage('butter.png');
-  watchPosition(positionChanged); // gps callback
+  textFont(myFont, 35);                              //Schriftart auf Leinwand laden
+  textSize(35);                                     //Schriftgröße
+  img = loadImage('butter.png');                     // Bild für Schmetterlinge
+  watchPosition(positionChanged);                   // GPS callback
 
 
-  button = createButton('Delete Connection');
-  button.position((windowWidth-(windowWidth-15)),(windowHeight-(windowHeight-90)));
-  button.mousePressed(reset);
+  button = createButton('Delete Connection');       // Delete Connection Button
+  button.position((windowWidth-(windowWidth-15)),(windowHeight-(windowHeight-90))); //Position des Buttons
+  button.mousePressed(reset);     // Die Funktion "reset" wird bei Aufruf des Buttons ausgeführt
 
 
   var firebaseConfig = { //Multiplayerfunktion
@@ -63,7 +72,7 @@ function setup() {
     appId: "1:71925730987:web:653c3bce55b035cc10f1ee",
     measurementId: "G-HS69VY7SRS"
   }
-  // Initialize Firebase
+  // Initialisierung Firebase
   firebase.initializeApp(firebaseConfig);
   console.log(firebase);
   console.log('uid:' + uid);
@@ -72,13 +81,17 @@ function setup() {
 
   
 
-  // eingebefeld für den Namen
+  // Eingabefeld für den Namen
   name = createInput();
-  name.position((windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-60)));
-  name.value(getItem('demoName')); // holt namen aus coookie
+  name.position((windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-60))); // Position des Feldes
+  name.value(getItem('demoName')); // Holt Namen aus Cookies
+
+  //Radius, in dem Schmetterlinge gespawnt werden (abhängig von spawnCoords)
   var radius = 0.5;
+  //Seed, der sich jeden Tag verändert für random Spawnkoordinaten
   Math.seedrandom("CatchingButterflies"+ day() + month() + year());
 
+  //Schmetterlings-Objekte der Schmetterlings-Klasse anhand von spawnCoords und Seed erzeugen
   for(let i = 0; i < spawnCoords.length; i++){
     for(let butterflyCount = 0; butterflyCount<300; butterflyCount++){
       var c = {lat:spawnCoords[i].lat+(Math.random())*radius*0.3, lng: spawnCoords[i].lng+(Math.random()-0.6)*radius};
@@ -88,24 +101,27 @@ function setup() {
   
     myMap = mappa.tileMap(options); 
     myMap.overlay(canvas);//MapBox Karte wird auf die Leinwand gelegt.
+
+    //Funktionen, die bei Bewegung der Karte ausgeführt werden
     myMap.onChange(drawPlayer);
     myMap.onChange(drawButterflies);
     myMap.onChange(textDraw);
 
   
-  maintenancePlayerData();
-  updatePlayerData();
-  getAllPlayerData();
-  setInterval(updateData, 2000); // daten mit server abgleichen
+  maintenancePlayerData(); // "Zombies" entfernen
+  updatePlayerData();       // Eigene Daten aktualisieren
+  getAllPlayerData();       // Daten aller Spieler von DB abrufen
+  setInterval(updateData, 2000); // Daten mit Server abgleichen
  
 }
 
 function reset(){
+  // Verbindung löschen
   idPartner = 'none';
   netBoolean = false;
 }
 
-function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
+function draw() { // Spieler, Schmetterlinge und Schriften werden auf die Leinwand gezeichnet
   drawPlayer();
   drawButterflies();
   textDraw();
@@ -113,13 +129,13 @@ function draw() { // Spieler und Schriften werden auf die Leinwand gezeichnet
 
 function textDraw(){ //Schriften 
   fill(255, 105, 180);
-  text("your name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
+  text("Your Name", (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-50)));
   fill(84, 139, 84,200);
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
 }
 
-function drawButterflies(){
+function drawButterflies(){ //Schmetterlings-Objekte aus Array auf Leinwand darstellen
   for(let i = 0; i < butterflies.length; i++){
    butterflies[i].move();
     butterflies[i].display();
@@ -131,7 +147,7 @@ function drawButterflies(){
 
 
 
-function drawPlayer() { //Spieler implementieren
+function drawPlayer() { //Spieler darstellen
   
   clear();
   
@@ -142,21 +158,23 @@ function drawPlayer() { //Spieler implementieren
   size = map(myMap.zoom(), 1, 6, 5, 7);
   noStroke();
   fill(255, 105, 180);
-  ellipse(mypos.x, mypos.y, size, size);
+  ellipse(mypos.x, mypos.y, size, size); //Eigener Punkt
   fill(255, 105, 180);
-  text(name.value(), mypos.x+5, mypos.y);
+  text(name.value(), mypos.x+5, mypos.y); //Darstellung Name
   
+  //Durch Liste mit Spielern iterieren
   if (players != null) {
     var keys = Object.keys(players);
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
-      // console.log("Key: " + k + "   lat: " + players[k].lat + "   Name: " + players[k].long);
-      if (k != uid) {
-        // not myself      
+
+      // Nicht ich 
+      if (k != uid) {    
         var pos = myMap.latLngToPixel(players[k].lat, players[k].long);
         size = map(myMap.zoom(), 1, 6, 5, 7);
       
             if(players[k].netBoolean){
+              //Darstellung der anderen Spieler auf der Karte, wenn diese EINE (potentielle) Verbindung zu einer anderen Person eingegangen sind (Name und Punkt = lila)
                 noStroke();
               fill(106, 90, 205);
               ellipse(pos.x, pos.y, size, size);
@@ -164,6 +182,7 @@ function drawPlayer() { //Spieler implementieren
               text(players[k].name, pos.x + 5, pos.y);
             
             }else{
+              //Darstellung der anderen Spieler auf der Karte, wenn diese noch KEINE (potentielle) Verbindung zu einer anderen Person eingegangen sind (Name und Punkt = hell blau)
               noStroke();
               fill(121, 205, 205);
               ellipse(pos.x, pos.y, size, size);
@@ -173,22 +192,25 @@ function drawPlayer() { //Spieler implementieren
         
         for (var j = 0; j < keys.length; j++) {
           var ko = keys[j];
-          if (ko != k) { // selfcheck
-            var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); 
+          if (ko != k) { // Selfcheck
+            var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
             
-                if((players[ko].idPartner == uid && !netBoolean && idPartner == 'none' )
-                      ||( players[ko].idPartner == 'none' && !players[ko].netBoolean && idPartner == players[ko].uid)){
+                //Potentielle Verbindung (grau), wenn mich jemand anfragt und ich diesen noch nicht ausgewählt habe ODER wenn ich jemanden anfrage und dieser noch keinen Partner ausgewählt hat
+                if((players[ko].idPartner == uid && !netBoolean && idPartner == 'none' ) ||( players[ko].idPartner == 'none' && !players[ko].netBoolean && idPartner == players[ko].uid)){
                   stroke(193, 205, 205,200);             
                   line(mypos.x, mypos.y, pos_other.x, pos_other.y);
+
+                  //Verbindung zum Schmetterlinge fangen, wenn zwei Spieler sich gegenseitig angeklickt haben
                 }else if(players[ko].idPartner == uid && idPartner == players[ko].uid){
                        idPartner = players[ko].uid;
                         stroke(137, 104, 205,200);
-                        line(mypos.x, mypos.y, pos_other.x, pos_other.y); 
+                        line(mypos.x, mypos.y, pos_other.x, pos_other.y); // lila "Netz" bzw. Linie
                         for(var b = 0; b < butterflies.length; b++){
-                          butterflies[b].checkCollision(mypos,pos_other);
+                          butterflies[b].checkCollision(mypos,pos_other); // Hat die Verbindungslinie einen Schmetterling tangiert?
 
                         }                         
                      }
+                     //Verbindung wird gelöscht, wenn man einen Spieler anfragt, der jemand anderen angeklickt hat (mit Meldung)
                      else if (idPartner == players[ko].uid && players[ko].idPartner != 'none' && players[ko].idPartner != uid){
                       reset();
                       alert("Your connection to " + players[ko].name + "has been deleted. " + players[ko].name + " found somebody else to play with...");
@@ -203,8 +225,9 @@ function drawPlayer() { //Spieler implementieren
   
 }
 
-function mouseReleased(){
-  if(idPartner == 'none'){
+function mouseReleased(){ //Auswählen von Spieler, mit dem man Schmetterlinge fangen möchte
+  //Durch Liste mit Spielern iterieren
+  if(idPartner == 'none'){ // nur wenn noch keine Verbindungsanfrage zu einem Spieler besteht
   if (players != null) {
   var keys = Object.keys(players);
       for (var i = 0; i < keys.length; i++) {
@@ -212,12 +235,15 @@ function mouseReleased(){
         if (k != uid) {
           for (var j = 0; j < keys.length; j++) {
             var ko = keys[j];
-            if (ko != k) { // selfcheck
-              var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long);
-              if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20){           
-                  idPartner = players[ko].uid;        
-                  alert("You tried to connect to " + players[ko].name);
-                  netBoolean = true;       
+            if (ko != k) { // Selfcheck
+              var pos_other = myMap.latLngToPixel(players[ko].lat, players[ko].long); // Positionen der anderen Spieler
+
+
+              if(abs(pos_other.x-mouseX)<20 && abs(pos_other.y-mouseY)<20 && idPartner == 'none'){ 
+                //Wenn Klick in unmittelbarer Nähe zu anderem Spieler erfolgt -> Verbindungsanfrage über "idPartner" Variable mit Meldung       
+                  idPartner = players[ko].uid; //zuweisen der uid des angefragten Spielers        
+                  alert("You tried to connect to " + players[ko].name); // Meldung, dass Verbindungsanfrage erfolgt ist
+                  netBoolean = true; //(potentielle) Verbindung besteht      
                 
                }
                 
@@ -230,16 +256,21 @@ function mouseReleased(){
   }
 
 function updateData() {
-  updatePlayerData(); // meine daten updaten
-  maintenancePlayerData(); // afk Spieler entfernen
-  getAllPlayerData(); // alle anders player daten holen
+  updatePlayerData();       // Meine Daten updaten
+  maintenancePlayerData();  // afk Spieler entfernen
+  getAllPlayerData();       // Andere Spielerdaten abrufen
   storeItem('demoName', name.value()); // meinen player namen im coookie speichern
 }
 
-function getAllPlayerData() {
+function getAllPlayerData() { //Spielerdaten von Datenbank abrufen
   var ref = database.ref("player");
   ref.on("value", gotData, errData);
 }
+
+/*function getAllButterfliesData(){
+  var ref = database.ref('butterflies');
+  ref.on("value", gotDataButterflies, errData);
+}*/
 
 function errData(data) {
   // nop
@@ -249,12 +280,17 @@ function gotData(data) {
   players = data.val();
 }
 
-function positionChanged(position) {
+/*
+function gotDataButterflies(data){
+  butterflies = data.val();
+}*/
+
+function positionChanged(position) { //Anpassung Standortdaten
   lat = position.latitude;
   long = position.longitude;
 }
 
-function maintenancePlayerData() {
+function maintenancePlayerData() { //"Zombies" entfernen
   var ref = firebase.database().ref('player');
   var now = Date.now();
   var cutoff = now - 20 * 1000; // 20 sekunden.
@@ -264,13 +300,33 @@ function maintenancePlayerData() {
   });
 }
 
+/*
+function updateButterfliesToServer(){
+  for(let i = 0; i < butterflies.length; i++){
+    var position = myMap.pixelToLatLng(butterflies[i].x, butterflies[i].y)
+      firebase.database().ref('butterflies/' + butterflies[i].id).set({
+        lat: position.latitude,
+        long: position.longitude,
+        timestamp: Date.now()
+      });
+    }
+  }*/
 
-function updatePlayerData() {
+
+function updatePlayerData() { // Spielerdaten an Firebase Datenbank übertragen
+  /*
+  if (rotationZ != null) {
+    direction = rotationZ;
+  } else {
+    direction = ""; // no gps
+  }*/
   firebase.database().ref('player/' + uid).set({
     lat: lat,
     long: long,
+    //direction: direction,
     name: name.value(),
     timestamp: Date.now(),
+    //request: request,
     idPartner: idPartner,  
     uid: uid,
     netBoolean: netBoolean,
@@ -281,9 +337,9 @@ function updatePlayerData() {
 
 function gen_uid() {
   /*
-   erzeuge eine user id anhänig von bildschirmaufläsung; browser id, etc....
-   https://pixelprivacy.com/resources/browser-fingerprinting/
-   https://en.wikipedia.org/wiki/Device_fingerprint
+   Erzeugt eine uid abhängig von Bildschirmauflösung; Browser ID, etc....
+   Quellen: https://pixelprivacy.com/resources/browser-fingerprinting/
+            https://en.wikipedia.org/wiki/Device_fingerprint
   */
   var navigator_info = window.navigator;
   var screen_info = window.screen;
@@ -300,31 +356,37 @@ class Butterflies{
   
  //Schmetterlinge-Klasse
   constructor(coords){
+    //Schmetterling ID
     this.id = "S"+ int(random(100000000));
-    this.dead = false;
-    this.birthtime = millis();
+
+    //Schmetterling schon gefangen?
+    this.dead = false; 
+
+    //Standort
     this.lng = coords.lng;
     this.lat = coords.lat;
     this.x = 0;
     this.y = 0;
-    this.maxAge = random(5000, 15000);
-    this.diameter = 35;
+    
+    //Größe Bild Schmetterlinge
+    this.diameter = 35; 
   }
 
-  move(){
+  
+  move(){ // "zuckende" Bewegung der Schmetterlinge
     var coord = myMap.latLngToPixel(this.lat, this.lng);
-    this.x = coord.x + random(-1,1); //(this.x * (1-speed)) + (this.targetx * speed);
-    this.y = coord.y + random(-1,1); //(this.y * (1-speed)) + (this.targety * speed);
+    this.x = coord.x + random(-1,1); 
+    this.y = coord.y + random(-1,1);
   }
 
-  display(){       
+  display(){ // Anzeigen der Schmetterlinge auf der Leinwand       
    if(!this.dead){
       image(img, this.x-this.diameter/2, this.y-this.diameter/2, this.diameter, this.diameter);
     }
  }
 
 
- checkCollision(mypos,pos_other){
+ checkCollision(mypos,pos_other){ //Kollisionsabfrage mit Schmetterling
   var pointonline = getClosestPointOnLines({x:this.x,y:this.y},[mypos,pos_other]);
   var geoPoint = myMap.pixelToLatLng(pointonline.x, pointonline.y);
   var dist = GeoDistanceInMeter(geoPoint.lat,geoPoint.lng,this.lat, this.lng);
@@ -341,7 +403,9 @@ class Butterflies{
    lines defined by array aXys with nodes having properties .x and .y 
    return is object with .x and .y properties and property i indicating nearest segment in aXys 
    and property fFrom the fractional distance of the returned point from aXy[i-1]
-   and property fTo the fractional distance of the returned point from aXy[i]   */
+   and property fTo the fractional distance of the returned point from aXy[i]   
+
+   Quelle: https://stackoverflow.com/questions/32281168/find-a-point-on-a-line-closest-to-a-third-point-javascript*/
 
 
    function getClosestPointOnLines(pXy, aXys) {
@@ -418,6 +482,13 @@ class Butterflies{
 }
 
 const EARTH_RADIUS = 6378137;
+
+/*
+This uses the ‘haversine’ formula to calculate the great-circle distance between two points – 
+that is, the shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance
+ between the points (ignoring any hills they fly over, of course!)
+Quelle:http://www.movable-type.co.uk/scripts/latlong.html?from=48.86,-122.0992&to=48.8599,-122.1449
+*/
 
 function GeoDistanceInMeter(lat1, lon1, lat2, lon2) {
     //const R = 6371e3; // metres
