@@ -134,7 +134,8 @@ function textDraw(){ //Schriften
   fill(137, 104, 205);
   text("Your Score: " + score, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-140)));
   fill(137, 104, 205);
-  text("PartnerID " + idPartner, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-200)));
+ var keys = Object.keys(players);
+  text("Keys =  " + keys.length, (windowWidth-(windowWidth-15)), (windowHeight-(windowHeight-200)));
 }
 
 function drawButterflies(){ //Schmetterlings-Objekte aus Array auf Leinwand darstellen
