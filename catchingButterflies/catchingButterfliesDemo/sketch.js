@@ -287,10 +287,8 @@ function updatePlayerData() { // Spielerdaten an Firebase Datenbank übertragen
   firebase.database().ref('player/' + uid).set({
     lat: lat,
     long: long,
-    direction: direction,
     name: name.value(),
     timestamp: Date.now(),
-    request: request,
     idPartner: idPartner,  
     uid: uid,
     netBoolean: netBoolean,
